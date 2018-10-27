@@ -4,7 +4,6 @@ module.exports = track;
 
 const _ = require('lodash');
 const co = require('co');
-const jsdiff = require('diff')
 
 const keyToMessageMap = new Map();
 const pinMap = new Map();
@@ -70,8 +69,7 @@ function track(clients, utils) {
     if (message.deleted) {
       reply(`消息被删了：${originalMessage.text}`);
     } else {
-      const diffResult = diffMessages(originalMessage.text, message.text);
-      reply(`消息修改了：\n${diffResult}`);
+      reply(`消息修改了，原文是：${originalMessage.text}`);
     }
 
     keyToMessageMap.set(key, message);
@@ -113,25 +111,4 @@ function track(clients, utils) {
       }
     });
   }
-
-  function diffMessages(originalMessage, updatedMessage) {
-    let originalValue = "";
-    let updatedValue = "";
-
-    const diff = jsdiff.diffChars(originalMessage, updatedMessage);
-    diff.forEach(function(part){
-        const value = part.value;
-        if (part.added) {
-            updatedValue += "**" + value + "**";
-        } else if (part.removed) {
-            originalValue += "~~" + value + "~~";
-        } else {
-            updatedValue += value;
-            originalValue += value;
-        }
-    });
-
-    return `原消息：${originalValue}\n***\n新消息：${updatedValue}`;
-  }
 }
-
